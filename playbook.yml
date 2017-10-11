@@ -6,11 +6,16 @@
   tasks:
     - shell: more /etc/hosts
 
-- name: Playbook Remoto Ejemplo
+- name: Playbook Using Roles
   hosts: remote
   gather_facts: true
   tags: always
-  tasks:
+  pre_tasks:
+    - shell: more /etc/hosts
+  roles:
+    - role: basic-setup
+      machine_name: bigeekie-ansible
+  post_tasks:
     - shell: more /etc/hosts
 
 - name: Playbook Hostvars

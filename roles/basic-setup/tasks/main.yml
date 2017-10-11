@@ -1,0 +1,52 @@
+####################################################################
+# Customize  Machine
+####################################################################
+- name: Setting hostname in {{ machine_name }}
+  register: hostname_result
+  hostname:
+    name: "{{ machine_name }}"
+  become: true
+
+- name: Asociate hostname {{ machine_name }} to 127.0.0.1
+  lineinfile: dest=/etc/hosts regexp="127\.0\.0\.1 .*" line="127.0.0.1 localhost {{ machine_name }}" backrefs=yes
+  become: true
+
+- name: reconfigure locale in {{ machine_name }} for Debian based distributions
+  locale_gen:
+    name: en_US.UTF-8
+    state: present
+  become: true
+
+- name: Touch /etc/default/locale in "{{ machine_name }}" for Debian based distributions
+  file:
+    dest: /etc/default/locale
+    state: touch
+  become: true
+
+- name: Setting locale in /etc/default/locale in "{{ machine_name }}" for Debian based distributions
+  lineinfile:
+    dest: /etc/default/locale
+    line: 'LC_ALL="en_US.UTF-8"'
+    regexp: "^LC_ALL="
+    state: present
+    insertafter: EOF
+  become: true
+
+- name: Restart machine if needed
+  shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+  async: 1
+  poll: 0
+  become: true
+  ignore_errors: true
+
+- name: sleep 5 seconds
+  pause: seconds=5
+
+- name: Waiting until the VM {{ machine_name }} is available
+  local_action: shell ssh -F ssh.cfg {{ machine_name }} echo hello
+  register: foo
+  become: false
+  delay: 5
+  retries: 60
+  until: foo.stdout.find('hello') != -1
+

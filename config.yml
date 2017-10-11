@@ -3,4 +3,4 @@
 #
 
 # This variable tells ansible to use the python interpreter in the virtualenv
-ansible_python_interpreter: python
+ansible_python_interpreter: "/usr/bin/env python"
