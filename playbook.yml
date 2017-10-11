@@ -13,6 +13,7 @@
   tasks:
     - shell: echo "{{ inventory_hostname }}"
       register: machine_name_result
+    - include_vars: "vault.yml"
     - include_role:
         name: basic-setup
       vars:
@@ -20,7 +21,7 @@
     - include_role:
         name: server
       vars:
-        port: 9090
+        port: "{{ server.port }}"
     - shell: more /etc/hosts
 
 - name: Playbook Hostvars
