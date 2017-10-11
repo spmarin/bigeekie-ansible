@@ -1,12 +1,22 @@
 - name: Playbook Ejemplo
-  hosts: localhost
+  hosts: test
   gather_facts: true
   connection: local
   tags: always
   tasks:
     - shell: more /etc/hosts
-      register: more_result
-    - debug:
-        msg: "{{ more_result }}"
-    - shell: echo "La IP de {{ (more_result.stdout_lines | last).split(' ')[1] }} es {{ (more_result.stdout_lines | last).split(' ')[0] }}"    
 
+- name: Playbook Remoto Ejemplo
+  hosts: remote
+  gather_facts: true
+  tags: always
+  tasks:
+    - shell: more /etc/hosts
+
+- name: Playbook Hostvars
+  hosts: remote
+  tags: always
+  tasks:
+    - debug:
+        msg: "{{ hostvars[item].ansible_default_ipv4.address }}"
+      with_items: "{{ groups.all }}"
