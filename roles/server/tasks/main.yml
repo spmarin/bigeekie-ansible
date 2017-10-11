@@ -1,0 +1,26 @@
+- name: ensure apache is at the latest version
+  apt: name=apache2 state=latest
+  become: true
+
+- name: change default index page
+  copy: src="{{ item }}" dest=/var/www/html/{{ item }}
+  with_items:
+    - index.html
+    - style.css
+  become: true
+
+- name: write the apache config file
+  template: src=port.conf.j2 dest=/etc/apache2/ports.conf
+  become: true
+  notify:
+  - restart apache
+
+- name: write the apache config file
+  template: src=apache2.conf.j2 dest=/etc/apache2/apache2.conf
+  become: true
+  notify:
+  - restart apache
+
+- name: ensure apache is running (and enable it at boot)
+  service: name=apache2 state=started enabled=yes
+  become: true
